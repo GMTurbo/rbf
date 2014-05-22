@@ -22,6 +22,7 @@ var RBF = function(){
   //f(x,y) = a1 + a2x + a3y + SUM(wi * kernel())
   var kernel = function(pnt1, pnt2){
     var r = distance(pnt1, pnt2);
+    if(r === 0 ) return 0;
     return Math.pow(r, 2) * Math.log(r);
   }
   
@@ -45,11 +46,11 @@ var RBF = function(){
      centers = cents;
      ws = [];
      ys = y_vals;
-     var matrix = [];
+     var matrix = [], matRow = [];
      var P = [], pRow = [];
      for(var i = 0 ; i < centers.length ; i++){
       
-      var matRow = [];
+      matRow = [];
       pRow = [1];
       for(var k = 0 ; k < centers[i].length ; k++){
        pRow.push(centers[i][k]);
@@ -57,7 +58,7 @@ var RBF = function(){
       
       for(var j = 0 ; j < centers.length ; j++){
         
-        if(i === j){ matRow.push(1); continue; }
+        //if(i === j){ matRow.push(1); continue; }
         
         matRow.push(kernel(centers[i], centers[j]));
         
@@ -111,7 +112,7 @@ var RBF = function(){
   this.getValue = function(pnt){
     var result = 0;
     for(var i = 0 ; i < centers.length; i++){
-      result += Number(ws.elements[i]) * distance(pnt, centers[i]);
+      result += Number(ws.elements[i]) * kernel(pnt, centers[i]);
     }
     result += Number(ws.elements[centers.length]);
     for(var i = 0 ; i < pnt.length ; i++){
@@ -167,30 +168,30 @@ rbf2D.compile(pnts2D, [10,20,30,40], function(err, data){
   }
 });
 
-// var pnts3D = [[10, 10, 1],[10, 2, 1],[1, 10, 1], [4,1,1]];
+var pnts3D = [[10, 10, 1],[10, 2, 1],[1, 10, 1], [4,1,1]];
   
-// var testPnts3D = [
-//   [0, 0, 1],
-//   [0, 1, 0],
-//   [1, 0, 0],
-//   [1, 0, 1],
-//   [0, 1, 0],
-//   [1, 1, 1]
-// ];
+var testPnts3D = [
+  [0, 0, 1],
+  [0, 1, 0],
+  [1, 0, 0],
+  [1, 0, 1],
+  [0, 1, 0],
+  [1, 1, 1]
+];
 
-// var rbf3D = new RBF();
+var rbf3D = new RBF();
 
-// rbf3D.compile(pnts3D, [10,20,5,10], function(err, data){
-//   if(err){
-//     console.error(err);
-//     return;
-//   }
-//   if(data.result == 'success'){
-//     console.log('worked!');
-//     rbf3D.getValues(testPnts3D, function(err, result){
-//       if(err) {console.error(err); return;}
+rbf3D.compile(pnts3D, [10,20,5,10], function(err, data){
+  if(err){
+    console.error(err);
+    return;
+  }
+  if(data.result == 'success'){
+    console.log('worked!');
+    rbf3D.getValues(testPnts3D, function(err, result){
+      if(err) {console.error(err); return;}
       
-//       console.dir(result);
-//     })
-//   }
-// });
+      console.dir(result);
+    })
+  }
+});
