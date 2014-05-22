@@ -52,13 +52,11 @@ var RBF = function(){
       
       matRow = [];
       pRow = [1];
-      for(var k = 0 ; k < centers[i].length-1 ; k++){
+      for(var k = 0 ; k < centers[i].length; k++){
        pRow.push(centers[i][k]);
       }
       
       for(var j = 0 ; j < centers.length ; j++){
-        
-        //if(i === j){ matRow.push(1); continue; }
         
         matRow.push(kernel(centers[i], centers[j]));
         
@@ -82,7 +80,10 @@ var RBF = function(){
        ys.push(0);
      }
      
-     console.dir(matrix);
+    // console.log("X:");
+    // console.dir(matrix);
+    // console.log("Y:");
+    // console.dir(ys);
      
      ws = this._solve(ys, matrix);
      
@@ -115,7 +116,7 @@ var RBF = function(){
       result += Number(ws.elements[i]) * kernel(pnt, centers[i]);
     }
     result += Number(ws.elements[centers.length]);
-    for(var i = 0 ; i < pnt.length ; i++){
+    for(var i = 1 ; i < pnt.length ; i++){
       result += pnt[i] * Number(ws.elements[centers.length+i]);
     }
     return result;
@@ -146,11 +147,7 @@ var testPnts2D = [
   [10, 10],
   [20, 10],
   [30, 20],
-  [40, 100],
-  [5, 5],
-  [5, 10],
-  [30, 5],
-  [40, 10]
+  [40, 100]
   ];
 
 rbf2D.compile(pnts2D, [10,20,30,40], function(err, data){
@@ -184,7 +181,7 @@ var testPnts3D = [
 
 var rbf3D = new RBF();
 
-rbf3D.compile(pnts3D, [10,10,1,1], function(err, data){
+rbf3D.compile(pnts3D, [10,10,100,100], function(err, data){
   if(err){
     console.error(err);
     return;
