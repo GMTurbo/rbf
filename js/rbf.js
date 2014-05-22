@@ -52,7 +52,7 @@ var RBF = function(){
       
       matRow = [];
       pRow = [1];
-      for(var k = 0 ; k < centers[i].length ; k++){
+      for(var k = 0 ; k < centers[i].length-1 ; k++){
        pRow.push(centers[i][k]);
       }
       
@@ -168,20 +168,23 @@ rbf2D.compile(pnts2D, [10,20,30,40], function(err, data){
   }
 });
 
-var pnts3D = [[10, 10, 1],[10, 2, 1],[1, 10, 1], [4,1,1]];
+var pnts3D = [
+  [0, 0, 1],
+  [0, 1, 0],
+  [1, 0, 0],
+  [1, 0, 1]
+];
   
 var testPnts3D = [
   [0, 0, 1],
   [0, 1, 0],
   [1, 0, 0],
-  [1, 0, 1],
-  [0, 1, 0],
-  [1, 1, 1]
+  [1, 0, 1]
 ];
 
 var rbf3D = new RBF();
 
-rbf3D.compile(pnts3D, [10,20,5,10], function(err, data){
+rbf3D.compile(pnts3D, [10,10,1,1], function(err, data){
   if(err){
     console.error(err);
     return;
