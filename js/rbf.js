@@ -12,6 +12,8 @@ var RBF = function(){
   
   var distance = function(pnt1, pnt2){
     var sum = 0;
+    if(!pnt1.length)
+      return Math.sqrt(Math.pow(pnt1 - pnt2, 2));
     for(var i = 0 ; i < pnt1.length ; i++){
       sum += (Math.pow(pnt1[i] - pnt2[i], 2));
     }
