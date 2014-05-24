@@ -12,12 +12,31 @@ var RBF = function(){
   
   var distance = function(pnt1, pnt2){
     var sum = 0;
+    if(!pnt1.length)
+      return Math.sqrt(Math.pow(pnt1 - pnt2, 2));
+      
     for(var i = 0 ; i < pnt1.length ; i++){
       sum += (Math.pow(pnt1[i] - pnt2[i], 2));
     }
     return Math.sqrt(sum);
   }
   
+  this.print = function(matrix){
+    if(matrix){
+      var row;
+      for(var i = 0 ; i < matrix.length; i++){
+        if(matrix[i].length){
+          row = matrix[i].reduce(function(str, curr){
+            return str += curr + ', ';
+          }, '');
+          console.log(row);
+        }else{
+          console.log(matrix[i]);
+        }
+        
+      }
+    }
+  };
   //this is going to be a thin-plate spline
   //f(x,y) = a1 + a2x + a3y + SUM(wi * kernel())
   var kernel = function(pnt1, pnt2){
@@ -43,15 +62,16 @@ var RBF = function(){
         return;
      }
      
-     centers = cents;
+     centers = cents.map(function(curr){return curr});
      ws = [];
-     ys = y_vals;
+     ys = y_vals.map(function(curr){return curr});
      var matrix = [], matRow = [];
      var P = [], pRow = [];
      for(var i = 0 ; i < centers.length ; i++){
       
       matRow = [];
       pRow = [1];
+      
       for(var k = 0 ; k < centers[i].length; k++){
        pRow.push(centers[i][k]);
       }
@@ -80,18 +100,17 @@ var RBF = function(){
        ys.push(0);
      }
      
-    // console.log("X:");
-    // console.dir(matrix);
-    // console.log("Y:");
-    // console.dir(ys);
-     
+     this.print(matrix);
+     console.log('');
+     this.print(ys);
+     console.log('');
      ws = this._solve(ys, matrix);
      
      if(!ws){
        cb('rbf failed to compile with given centers./nCenters must be unique :/');
        return;
      }
-     
+     this.print(ws.elements);
      cb(null, {result: 'success'});
      
     }.bind(this), 0);
@@ -135,29 +154,19 @@ var RBF = function(){
 
 //testing
 
-var rbf2D = new RBF();
+var rbf = new RBF();
 
-var pnts2D = [
-  [10, 10],
-  [20, 10],
-  [30, 20],
-  [40, 100]
-  ];
-var testPnts2D = [
-  [10, 10],
-  [20, 10],
-  [30, 20],
-  [40, 100]
-  ];
+var arr = [1, 2, 3, 4, 5, 6];
+var targets = [20, 400, 60, 80, 1000, 120];
 
-rbf2D.compile(pnts2D, [10,20,30,40], function(err, data){
-  if(err){
+rbf.compile(arr, targets, function(err, data){
+  if(err) {
     console.error(err);
     return;
   }
   if(data.result == 'success'){
-    console.log('worked!');
-    rbf2D.getValues(testPnts2D, function(err, result){
+    console.log('1D worked!');
+    rbf.getValues(arr, function(err, result){
       if(err) {console.error(err); return;}
       
       console.dir(result);
@@ -165,33 +174,62 @@ rbf2D.compile(pnts2D, [10,20,30,40], function(err, data){
   }
 });
 
-var pnts3D = [
-  [0, 0, 1],
-  [0, 1, 0],
-  [1, 0, 0],
-  [1, 0, 1]
-];
+var arr2D = [
+  [1, 2],
+  [2, 3],
+  [3, 4],
+  [4, 5],
+  [5, 6],
+  [6, 7]
+  ];
   
-var testPnts3D = [
-  [0, 0, 1],
-  [0, 1, 0],
-  [1, 0, 0],
-  [1, 0, 1]
-];
+var i = 1;
 
-var rbf3D = new RBF();
+var rbf2 = new RBF();
 
-rbf3D.compile(pnts3D, [10,10,100,100], function(err, data){
+rbf2.compile(arr2D, targets,
+function(err, data){
   if(err){
     console.error(err);
     return;
   }
   if(data.result == 'success'){
-    console.log('worked!');
-    rbf3D.getValues(testPnts3D, function(err, result){
+    console.log('2D worked!');
+    rbf2.getValues(arr2D, function(err, result){
       if(err) {console.error(err); return;}
       
       console.dir(result);
-    })
+    });
   }
 });
+
+// var pnts3D = [
+//   [0, 0, 1],
+//   [0, 1, 0],
+//   [1, 0, 0],
+//   [1, 0, 1]
+// ];
+  
+// var testPnts3D = [
+//   [0, 0, 1],
+//   [0, 1, 0],
+//   [1, 0, 0],
+//   [1, 0, 1]
+// ];
+
+// var rbf3D = new RBF();
+
+// rbf3D.compile(pnts3D, [10,10,10,10], function(err, data){
+//   if(err){
+//     console.error(err);
+//     return;
+//   }
+//   if(data.result == 'success'){
+//     console.log('worked!');
+//     rbf3D.getValues(testPnts3D, function(err, result){
+//       if(err) {console.error(err); return;}
+      
+//       console.dir(result);
+//     })
+//   }
+// });
