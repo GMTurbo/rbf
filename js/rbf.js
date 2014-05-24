@@ -45,9 +45,9 @@ var RBF = function(){
         return;
      }
      
-     centers = cents;
+     centers = cents.map(function(curr) { return curr;});
      ws = [];
-     ys = y_vals;
+     ys = y_vals.map(function(curr) { return curr;});
      var matrix = [], matRow = [];
      var P = [], pRow = [];
      for(var i = 0 ; i < centers.length ; i++){
@@ -82,11 +82,6 @@ var RBF = function(){
        ys.push(0);
      }
      
-    // console.log("X:");
-    // console.dir(matrix);
-    // console.log("Y:");
-    // console.dir(ys);
-     
      ws = this._solve(ys, matrix);
      
      if(!ws){
@@ -113,13 +108,13 @@ var RBF = function(){
   };
   
   this.getValue = function(pnt){
-    var result = 0;
-    for(var i = 0 ; i < centers.length; i++){
+    var result = 0, i = 0;
+    for( i = 0 ; i < centers.length; i++){
       result += Number(ws.elements[i]) * kernel(pnt, centers[i]);
     }
     result += Number(ws.elements[centers.length]);
-    for(var i = 1 ; i < pnt.length ; i++){
-      result += pnt[i-1] * Number(ws.elements[centers.length+i]);
+    for( i = 0 ; i < pnt.length ; i++){
+      result += pnt[i] * Number(ws.elements[centers.length+(i+1)]);
     }
     return result;
   };
@@ -137,6 +132,32 @@ var RBF = function(){
 
 //testing
 
+var target = [10,20,30,40];
+
+var rbf1D = new RBF();
+
+var pnts1D = [
+  [10],
+  [20],
+  [30],
+  [40]
+  ];
+
+rbf1D.compile(pnts1D, target, function(err, data){
+  if(err){
+    console.error(err);
+    return;
+  }
+  if(data.result == 'success'){
+    console.log('worked!');
+    rbf1D.getValues(pnts1D, function(err, result){
+      if(err) {console.error(err); return;}
+      
+      console.dir(result);
+    });
+  }
+});
+
 var rbf2D = new RBF();
 
 var pnts2D = [
@@ -145,21 +166,15 @@ var pnts2D = [
   [30, 20],
   [40, 100]
   ];
-var testPnts2D = [
-  [10, 10],
-  [20, 10],
-  [30, 20],
-  [40, 100]
-  ];
 
-rbf2D.compile(pnts2D, [10,20,30,40], function(err, data){
+rbf2D.compile(pnts2D, target, function(err, data){
   if(err){
     console.error(err);
     return;
   }
   if(data.result == 'success'){
     console.log('worked!');
-    rbf2D.getValues(testPnts2D, function(err, result){
+    rbf2D.getValues(pnts2D, function(err, result){
       if(err) {console.error(err); return;}
       
       console.dir(result);
@@ -173,24 +188,17 @@ var pnts3D = [
   [1, 0, 0],
   [1, 0, 1]
 ];
-  
-var testPnts3D = [
-  [0, 0, 1],
-  [0, 1, 0],
-  [1, 0, 0],
-  [1, 0, 1]
-];
 
 var rbf3D = new RBF();
 
-rbf3D.compile(pnts3D, [10,10,100,100], function(err, data){
+rbf3D.compile(pnts3D, target, function(err, data){
   if(err){
     console.error(err);
     return;
   }
   if(data.result == 'success'){
     console.log('worked!');
-    rbf3D.getValues(testPnts3D, function(err, result){
+    rbf3D.getValues(pnts3D, function(err, result){
       if(err) {console.error(err); return;}
       
       console.dir(result);
