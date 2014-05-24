@@ -45,7 +45,7 @@ var RBF = function(){
     return Math.pow(r, 2) * Math.log(r);
   }
   
-  this.compile = function(cents, y_vals, cb){
+  this.compile = function(cents, cb){
    
     setTimeout(function(){
       if(!cents || cents.length === 0){
@@ -62,9 +62,18 @@ var RBF = function(){
         return;
      }
      
-     centers = cents.map(function(curr){return curr});
+     //set the last value of each point as the target
+     ys = cents.map(function(curr){
+        return curr[curr.length-1];
+     });
+     
+     //chop off the last dimension in each point
+     centers = cents.map(function(curr){
+       return curr.slice(0, curr.length-1)
+     });
+     
      ws = [];
-     ys = y_vals.map(function(curr){return curr});
+     
      var matrix = [], matRow = [];
      var P = [], pRow = [];
      for(var i = 0 ; i < centers.length ; i++){
@@ -132,11 +141,11 @@ var RBF = function(){
   this.getValue = function(pnt){
     var result = 0;
     for(var i = 0 ; i < centers.length; i++){
-      result += Number(ws.elements[i]) * kernel(pnt, centers[i]);
+      result += Number(ws.elements[i]) * kernel(pnt.slice(0,pnt.length-1), centers[i]);
     }
     result += Number(ws.elements[centers.length]);
     for(var i = 1 ; i < pnt.length ; i++){
-      result += pnt[i] * Number(ws.elements[centers.length+i]);
+      result += pnt[i-1] * Number(ws.elements[centers.length+i]);
     }
     return result;
   };
@@ -154,40 +163,38 @@ var RBF = function(){
 
 //testing
 
-var rbf = new RBF();
+// var rbf = new RBF();
 
-var arr = [1, 2, 3, 4, 5, 6];
-var targets = [20, 400, 60, 80, 1000, 120];
+// var arr = [1, 2, 3, 4, 5, 6];
+// var targets = [20, 400, 60, 80, 1000, 120];
 
-rbf.compile(arr, targets, function(err, data){
-  if(err) {
-    console.error(err);
-    return;
-  }
-  if(data.result == 'success'){
-    console.log('1D worked!');
-    rbf.getValues(arr, function(err, result){
-      if(err) {console.error(err); return;}
+// rbf.compile(arr, targets, function(err, data){
+//   if(err) {
+//     console.error(err);
+//     return;
+//   }
+//   if(data.result == 'success'){
+//     console.log('1D worked!');
+//     rbf.getValues(arr, function(err, result){
+//       if(err) {console.error(err); return;}
       
-      console.dir(result);
-    });
-  }
-});
+//       console.dir(result);
+//     });
+//   }
+// });
 
 var arr2D = [
-  [1, 2],
-  [2, 3],
-  [3, 4],
-  [4, 5],
-  [5, 6],
-  [6, 7]
+  [1, 5],
+  [2, 2],
+  [3, 5],
+  [4, 2],
+  [5, 5],
+  [6, 2]
   ];
   
-var i = 1;
-
 var rbf2 = new RBF();
 
-rbf2.compile(arr2D, targets,
+rbf2.compile(arr2D,
 function(err, data){
   if(err){
     console.error(err);
@@ -195,7 +202,9 @@ function(err, data){
   }
   if(data.result == 'success'){
     console.log('2D worked!');
-    rbf2.getValues(arr2D, function(err, result){
+    rbf2.getValues(arr2D.map(function(curr){
+       return curr;
+     }), function(err, result){
       if(err) {console.error(err); return;}
       
       console.dir(result);
